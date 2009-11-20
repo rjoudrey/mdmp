@@ -1,2 +1,5 @@
 EXPORTS
-  initMDMP
+  initMDmp
+  getDumps
+  releaseReqBuffers
+  dumpToDisk

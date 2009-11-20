@@ -1,0 +1,13 @@
+1. Requests (MDMP_DUMP_REQUEST):
+
+1.1. Structure members:
+
+   MDMP_DUMP_MODE dumpMode:
+      - selects what will be dumped: a memory region (MDMP_DUMP_REGION), a module
+      image (MDMP_DUMP_IMAGE) or the entire process memory (MDMP_DUMP_FULL)
+      
+   MDMP_SELECTION_MODE procSelMode:
+      - selects how the processes whose memory will be (partially) dumped are
+      selected
+      
+[...]
