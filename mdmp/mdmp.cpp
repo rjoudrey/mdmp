@@ -3,7 +3,7 @@
     Copyright (c) 2009-2010 Vlad-Ioan Topan
 
     author:           Vlad-Ioan Topan (vtopan / gmail.com)
-    file version:     0.2.0 (ALPHA)
+    file version:     0.2.1 (ALPHA)
     web:              http://code.google.com/p/mdmp/
 
     This file is part of MDmp.
@@ -25,14 +25,10 @@
 
 //=== include ================================================================//
 // local:
-#include "libmdmp.h"
+#include <libmdmp.h>
 // C/C++:
 #include <stdio.h>
 #include <string.h>
-
-//=== constants ==============================================================//
-#define MODE_PID                1
-#define MODE_PNAME              2
 
 //=== functions ==============================================================//
 int getHexArg(char *arg) {

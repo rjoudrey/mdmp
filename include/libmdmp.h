@@ -3,7 +3,7 @@
     Copyright (c) 2009-2010 Vlad-Ioan Topan
 
     author:           Vlad-Ioan Topan (vtopan / gmail.com)
-    file version:     0.2.0 (ALPHA)
+    file version:     0.2.1 (ALPHA)
     web:              http://code.google.com/p/mdmp/
 
     This file is part of MDmp.
@@ -34,9 +34,9 @@
 #include <psapi.h>
 #include <winternl.h>
 
-#include "undocwin.h"
+#include <undocwin.h>
 
-#define LIBMDMP_VER "0.2.0 (ALPHA)"
+#define LIBMDMP_VER "0.2.1 (ALPHA)"
 
 #define MDMP_DEBUG                  1
 #define MDMP_DYN_DEBUG              0
@@ -130,8 +130,8 @@ struct MDMP_DUMP_REQUEST {
 //=== APIs ===================================================================//
 int __stdcall initMDmp(); // libMDmp initialization function; returns 1 on success, 0 on fail
 
-DWORD __stdcall getDumps(MDMP_DUMP_REQUEST *req);
-void __stdcall releaseReqBuffers(MDMP_DUMP_REQUEST *req);
+DWORD __stdcall getDumps(struct MDMP_DUMP_REQUEST *req);
+void __stdcall releaseReqBuffers(struct MDMP_DUMP_REQUEST *req);
 DWORD __stdcall dumpToDisk(struct MDMP_DUMP_REQUEST *req);
 
 TCHAR __stdcall processName(DWORD pid);

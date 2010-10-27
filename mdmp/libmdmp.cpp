@@ -24,7 +24,7 @@
 */
 
 //=== include ================================================================//
-#include "libmdmp.h"
+#include <libmdmp.h>
 
 #include <stdio.h> // "debugging"; comment out for release
 
@@ -49,6 +49,9 @@ DWORD (__stdcall * NtQueryInformationThread_)(HANDLE, THREAD_INFORMATION_CLASS, 
 DWORD (__stdcall * NtQueryInformationProcess_)(HANDLE, PROCESS_INFORMATION_CLASS, PVOID, DWORD, PDWORD);
 
 TCHAR *UNKNOWN_TEXT = _T("[unknown]");
+char *dumpMarker = "<dumped by libmdmp> ";
+#define dumpMarkerSize 20
+#define dumpMarkerPos 0x1E
 
 //=== functions ==============================================================//
 
@@ -114,6 +117,13 @@ void _copy(TCHAR *dest, const TCHAR *src, DWORD maxSize) {
         i--;
         }
     dest[i] = 0;
+    }
+
+void _copyMem(BYTE *dest, const BYTE *src, size_t len) {
+    // copy len bytes from src to dest
+    while (len-- > 0) {
+        *dest++ = *src++;
+        }
     }
 
 int _length(const TCHAR *string) {
@@ -321,32 +331,36 @@ BOOL _addrIsDumped(MDMP_DUMP_REQUEST *req, size_t addr) {
     return FALSE;
     }
 
-void fixDumpImports(BYTE *imageData, size_t *size) {
-    }
-
-void fixDumpImage(BYTE *imageData, size_t *size) {
+void fixDumpImage(BYTE **ppImageData_, size_t *size, BOOL fixSections, BOOL fixImports) {
     PIMAGE_DOS_HEADER pDOSHeader;
     PIMAGE_NT_HEADERS pNTHeader;
     PIMAGE_SECTION_HEADER sections;
     size_t i, lastSec;
+    BYTE *pImageData = *ppImageData_;
 
     if (*size < sizeof(IMAGE_DOS_HEADER)) {
         return;
         }
-    pDOSHeader = (PIMAGE_DOS_HEADER)imageData;
+    pDOSHeader = (PIMAGE_DOS_HEADER)pImageData;
     if (pDOSHeader->e_magic != IMAGE_DOS_SIGNATURE || pDOSHeader->e_lfanew + sizeof(IMAGE_NT_HEADERS) > *size) {
         return;
         }
-    pNTHeader = (PIMAGE_NT_HEADERS)&imageData[pDOSHeader->e_lfanew];
+    pNTHeader = (PIMAGE_NT_HEADERS)&pImageData[pDOSHeader->e_lfanew];
     //pNTHeader->OptionalHeader.FileAlignment = min(pNTHeader->OptionalHeader.FileAlignment, 0x200);
     sections = IMAGE_FIRST_SECTION(pNTHeader);
-    if ((BYTE*)sections-imageData+pNTHeader->FileHeader.NumberOfSections*sizeof(IMAGE_SECTION_HEADER) > *size) {
+    if ((BYTE*)sections-pImageData+pNTHeader->FileHeader.NumberOfSections*sizeof(IMAGE_SECTION_HEADER) > *size) {
         return;
+        }
+
+    if (pDOSHeader->e_lfanew - dumpMarkerPos >= dumpMarkerSize) {
+        _copyMem(&(pImageData[dumpMarkerPos]), (BYTE*)dumpMarker, dumpMarkerSize);
         }
     lastSec = 0;
     for (i=0; i < pNTHeader->FileHeader.NumberOfSections; i++) {
-        sections[i].PointerToRawData = sections[i].VirtualAddress;
-        sections[i].SizeOfRawData = ALIGN_VALUE(sections[i].Misc.VirtualSize, pNTHeader->OptionalHeader.FileAlignment);
+        if (fixSections) {
+            sections[i].PointerToRawData = sections[i].VirtualAddress;
+            sections[i].SizeOfRawData = ALIGN_VALUE(sections[i].Misc.VirtualSize, pNTHeader->OptionalHeader.FileAlignment);
+            }
         if (sections[i].PointerToRawData > sections[lastSec].PointerToRawData) {
             lastSec = i;
             }
@@ -370,12 +384,7 @@ SIZE_T _dumpImage(MDMP_DUMP_REQUEST *req, HANDLE hProcess, HMODULE hModule) {
             return 0;
             }
         if (ReadProcessMemory(hProcess, modInfo.lpBaseOfDll, buf, size, &size)) {
-            if (!(req->flags & MDMP_FLAG_DONT_FIX_IMAGES)) {
-                fixDumpImage(buf, (size_t*)&size);
-                }
-            if (req->flags & MDMP_FLAG_FIX_IMPORTS) {
-                fixDumpImports(buf, (size_t*)&size);
-                }
+            fixDumpImage(&buf, (size_t*)&size, !(req->flags & MDMP_FLAG_DONT_FIX_IMAGES), req->flags & MDMP_FLAG_FIX_IMPORTS);
             GetModuleBaseName(hProcess, hModule, moduleName, MAX_PATH - 1);
             _sprintf(name, "pe[%s]", moduleName);
             _addDump(req, (size_t)modInfo.lpBaseOfDll, size, hProcess, 0, name, buf);
@@ -754,7 +763,7 @@ DWORD __stdcall dumpPIDToFile(DWORD pid, struct MDMP_DUMP_REQUEST *req) {
     }
 
 //=== entrypoint =============================================================//
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
+BOOL APIENTRY DllMainLibMDMP(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
         case DLL_PROCESS_ATTACH:
             if (!initMDmp()) {
