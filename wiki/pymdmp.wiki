@@ -5,6 +5,18 @@
 
 The library pymdmp.pyd implements Python bindings for the libmdmp module.
 
+= Example =
+{{{
+import pymdmp
+
+results = pymdmp.dump(pymdmp.SEL_BY_NAME, pymdmp.DUMP_IMAGE_BY_NAME, 0, processName="calc", moduleName="kernel")
+
+if type(results) == type([]): # DON'T do this kind of "error-checking" in real life! 
+   for res in results:
+       open(r'%s-%s-%d-%08X.dump' % res[:-1], 'wb').write(res[-1])
+       # produces something similar to calc.exe-pe[kernel32.dll]-3720-7C800000.dump
+}}}
+
 = API =
 
 == pydump.dump() ==
