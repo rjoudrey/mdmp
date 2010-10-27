@@ -1,4 +1,5 @@
 #summary Python binding for the libmdmp module
+#labels Python
 
 = Introduction =
 
