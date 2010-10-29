@@ -3,7 +3,7 @@
     Copyright (c) 2009-2010 Vlad-Ioan Topan
 
     author:           Vlad-Ioan Topan (vtopan / gmail.com)
-    file version:     0.2.0 (ALPHA)
+    file version:     0.2.2 (ALPHA)
     web:              http://code.google.com/p/mdmp/
 
     This file is part of MDmp.
@@ -22,6 +22,13 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
+/*
+Changelog:
+    0.2.2 (10/29/2010 3:13:05):
+        * bugfix: crash when fixing (aligning) PE sections increased the *size
+            of the buffer without *actually* increasing the size of the buffer...
+ */
 
 //=== include ================================================================//
 #include <libmdmp.h>
@@ -359,13 +366,15 @@ void fixDumpImage(BYTE **ppImageData_, size_t *size, BOOL fixSections, BOOL fixI
     for (i=0; i < pNTHeader->FileHeader.NumberOfSections; i++) {
         if (fixSections) {
             sections[i].PointerToRawData = sections[i].VirtualAddress;
-            sections[i].SizeOfRawData = ALIGN_VALUE(sections[i].Misc.VirtualSize, pNTHeader->OptionalHeader.FileAlignment);
+            sections[i].SizeOfRawData = min(*size - sections[i].PointerToRawData, ALIGN_VALUE(sections[i].Misc.VirtualSize, pNTHeader->OptionalHeader.FileAlignment));
             }
         if (sections[i].PointerToRawData > sections[lastSec].PointerToRawData) {
             lastSec = i;
             }
         }
-    *size = sections[lastSec].PointerToRawData + sections[lastSec].SizeOfRawData;
+    if (*size > sections[lastSec].PointerToRawData + sections[lastSec].SizeOfRawData) {
+        *size = sections[lastSec].PointerToRawData + sections[lastSec].SizeOfRawData;
+        }
     }
 
 SIZE_T _dumpImage(MDMP_DUMP_REQUEST *req, HANDLE hProcess, HMODULE hModule) {

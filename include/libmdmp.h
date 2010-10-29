@@ -36,7 +36,8 @@
 
 #include <undocwin.h>
 
-#define LIBMDMP_VER "0.2.1 (ALPHA)"
+#define LIBMDMP_VER "0.2.2 (ALPHA)"
+// timestamp: 10/29/2010 3:15:49
 
 #define MDMP_DEBUG                  1
 #define MDMP_DYN_DEBUG              0
