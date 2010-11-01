@@ -3,7 +3,7 @@
     Copyright (c) 2010 Vlad-Ioan Topan
 
     author:           Vlad-Ioan Topan (vtopan / gmail.com)
-    file version:     0.1 (ALPHA)
+    file version:     0.2.4 (ALPHA)
     web:              http://code.google.com/p/mdmp/
 
     This file is part of MDmp.
@@ -94,34 +94,43 @@ PyObject * pyDump(PyObject *self, PyObject *args, PyObject *kargs) {
     //  * flags(integer): OR-combination of FLAG_* constants
     //  * optionalArgs:
     //    * processName(string) if processSelectionMode == SEL_BY_NAME
-    //    * processPID(string) if processSelectionMode == SEL_BY_PID
+    //    * processID(string) if processSelectionMode == SEL_BY_PID
     //    * moduleName(string) if dumpMode == DUMP_IMAGE_BY_NAME
     //    * moduleAddr(string) if dumpMode == DUMP_IMAGE_BY_IMAGEBASE
     //    * regStart(integer), regEnd(integer) if dumpMode == DUMP_REGION
     // Return value: if successful, list of tuples (processName, dumpName, pid, dumpAddr, dumpData);
     //               ERR_* error code otherwise
-    static char *pydump_kargs[] = {"selMode", "dumpMode", "flags", "processName", "processPID", "moduleName",
+    static char *pydump_kargs[] = {"selMode", "dumpMode", "flags", "processName", "processID", "moduleName",
                                     "moduleAddr", "regStart", "regEnd", NULL};
     MDMP_DUMP_REQUEST req;
     MDMP_REGION *crt;
     DWORD res;
-    char *processName, *moduleName;
-    PyObject *result = PyList_New(0);;
+    char *processName = 0, *moduleName = 0;
+    PyObject *result;
 
     ZeroMemory(&req, sizeof(req));
-    PyArg_ParseTupleAndKeywords(args, kargs, "III|sIsIII", pydump_kargs, &req.procSelMode, &req.dumpMode, &req.flags, &processName,
-                                &req.pid, &moduleName, &req.imageBase, &req.startAddr, &req.endAddr);
+    if (!PyArg_ParseTupleAndKeywords(args, kargs, "III|sIsIII", pydump_kargs, &req.procSelMode, &req.dumpMode, &req.flags, &processName,
+                                &req.pid, &moduleName, &req.imageBase, &req.startAddr, &req.endAddr)) {
+        return Py_BuildValue("I", MDMP_ERR_INVALID_ARGS);
+        }
 
     if (req.procSelMode == MDMP_SEL_BY_NAME) {
+        if (!processName) {
+           return Py_BuildValue("I", MDMP_ERR_INVALID_ARGS);
+           }
         strcpy(req.processName, processName);
         }
     if (req.dumpMode == MDMP_DUMP_IMAGE_BY_NAME) {
+        if (!moduleName) {
+           return Py_BuildValue("I", MDMP_ERR_INVALID_ARGS);
+           }
         strcpy(req.moduleName, moduleName);
         }
 
     res = getDumps(&req);
 
     if (res == MDMP_OK) {
+        result = PyList_New(0);
         crt = req.regionList;
         while (crt) {
             //printf("%d\n", crt->pid); // ssIIIs#
@@ -131,7 +140,7 @@ PyObject * pyDump(PyObject *self, PyObject *args, PyObject *kargs) {
         releaseReqBuffers(&req);
         }
     else {
-
+        result = Py_BuildValue("I", res);
         }
 
     return result;
