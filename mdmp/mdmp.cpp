@@ -3,7 +3,7 @@
     Copyright (c) 2009-2010 Vlad-Ioan Topan
 
     author:           Vlad-Ioan Topan (vtopan / gmail.com)
-    file version:     0.2.1 (ALPHA)
+    file version:     0.2.4 (BETA)
     web:              http://code.google.com/p/mdmp/
 
     This file is part of MDmp.
@@ -136,9 +136,9 @@ int main(int argc, char *argv[], char *envp[]) {
         printf("MDmp %s: libmdmp-based process memory dumper\n(c) Vlad-Ioan Topan (vtopan@gmail.com)\n", LIBMDMP_VER);
 
         printf("\nProcess selection:\n\
-/a          dump from all processes (default)\n\n\
+/a          dump from all processes (default)\n\
 /p:###      by PID (dump from process with PID = ### (decimal))\n\
-/n:###      by name (dump from process with image name containing \"###\")\n\
+/n:###      by name (dump from process with image name containing \"###\")\n\n\
 Dump target selection:\n\
 default:    main executable image(s)\n\
 /m          all the memory from the selected process(es) - smart (recognize images, stacks, heaps)\n\
@@ -146,10 +146,10 @@ default:    main executable image(s)\n\
 /x          all executable images\n\
 /e:###      executable image(s) containing \"###\" in the name\n\
 /b:###      executable image(s) with imagebase = ### (hex)\n\
-/r:###:$$$  memory region: $$$ (hex) bytes from address ### (hex)\n\n\
+/r:###:$$$  memory region: $$$ (hex) bytes from address ### (hex)\n\
 /k          all stacks\n\
 /h          all heaps\n\
-/X          all areas with eXecutable attribute set\n\
+/X          all areas with eXecutable attribute set\n\n\
 Options:\n\
 /F          DON'T fix image dumps\n\
 /I          fix imports\n\

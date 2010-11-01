@@ -3,7 +3,7 @@
     Copyright (c) 2009-2010 Vlad-Ioan Topan
 
     author:           Vlad-Ioan Topan (vtopan / gmail.com)
-    file version:     0.2.2 (ALPHA)
+    file version:     0.2.4 (BETA)
     web:              http://code.google.com/p/mdmp/
 
     This file is part of MDmp.
@@ -470,10 +470,16 @@ DWORD __stdcall getDumps(struct MDMP_DUMP_REQUEST *req) {
 
     // select processes
     if (req->procSelMode == MDMP_SEL_BY_PID) { // single PID
+        if (!req->pid) {
+            return MDMP_ERR_INVALID_ARGS;
+            }
         pids[0] = req->pid;
         npids = 1;
         }
     else { // enumerate processes to select PIDs
+        if (req->procSelMode == MDMP_SEL_BY_NAME && ((!req->processName) || (!req->processName[0]))) {
+            return MDMP_ERR_INVALID_ARGS;
+            }
         npids = 0;
         snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
         if (snap == INVALID_HANDLE_VALUE) {
@@ -495,6 +501,7 @@ DWORD __stdcall getDumps(struct MDMP_DUMP_REQUEST *req) {
         while (Process32Next(snap, &pe32));
         CloseHandle(snap);
         }
+        
     if (!npids) {
         return MDMP_ERR_NO_PROCESS_MATCHES;
         }
