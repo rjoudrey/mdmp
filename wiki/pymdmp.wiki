@@ -28,7 +28,7 @@ if type(results) == type([]): # DON'T do this kind of "error-checking" in real l
  * flags(integer): OR-combination of `FLAG_*` constants
  * optionalArgs:
    * `processName(string)` if `processSelectionMode == SEL_BY_NAME`
-   * `processPID(string)` if `processSelectionMode == SEL_BY_PID`
+   * `processID(string)` if `processSelectionMode == SEL_BY_PID`
    * `moduleName(string)` if `dumpMode == DUMP_IMAGE_BY_NAME`
    * `moduleAddr(string)` if `dumpMode == DUMP_IMAGE_BY_IMAGEBASE`
    * `regStart(integer)`, `regEnd(integer)` if `dumpMode == DUMP_REGION`
