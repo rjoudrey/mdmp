@@ -1,9 +1,9 @@
 /*
     libMDmp - main MDmp library - header file
-    Copyright (c) 2009-2010 Vlad-Ioan Topan
+    Copyright (c) 2009-2011 Vlad-Ioan Topan
 
     author:           Vlad-Ioan Topan (vtopan / gmail.com)
-    file version:     0.2.4 (ALPHA)
+    file version:     0.2.5 (BETA)
     web:              http://code.google.com/p/mdmp/
 
     This file is part of MDmp.
@@ -36,7 +36,7 @@
 
 #include <undocwin.h>
 
-#define LIBMDMP_VER "0.2.4 (BETA)"
+#define LIBMDMP_VER "0.2.5 (BETA)"
 // timestamp: 11/1/2010 23:13:08
 
 #define MDMP_DEBUG                  1

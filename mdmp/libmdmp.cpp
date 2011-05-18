@@ -1,9 +1,9 @@
 /*
     libMDmp - main MDmp library
-    Copyright (c) 2009-2010 Vlad-Ioan Topan
+    Copyright (c) 2009-2011 Vlad-Ioan Topan
 
     author:           Vlad-Ioan Topan (vtopan / gmail.com)
-    file version:     0.2.4 (BETA)
+    file version:     0.2.5 (BETA)
     web:              http://code.google.com/p/mdmp/
 
     This file is part of MDmp.
@@ -25,6 +25,11 @@
 
 /*
 Changelog:
+    0.2.5 (15:42:17 18.05.2011):
+        * changed link parameters to statically link the CRT => the executables
+            no longer depend on the MS VS 2008 runtime
+        * added an x64 build
+
     0.2.2 (10/29/2010 3:13:05):
         * bugfix: crash when fixing (aligning) PE sections increased the *size
             of the buffer without *actually* increasing the size of the buffer...
@@ -501,7 +506,7 @@ DWORD __stdcall getDumps(struct MDMP_DUMP_REQUEST *req) {
         while (Process32Next(snap, &pe32));
         CloseHandle(snap);
         }
-        
+
     if (!npids) {
         return MDMP_ERR_NO_PROCESS_MATCHES;
         }
