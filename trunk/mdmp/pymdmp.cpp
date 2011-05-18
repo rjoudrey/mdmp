@@ -1,9 +1,9 @@
 /*
     pymdmp - Python wrapper for the libmdmp library
-    Copyright (c) 2010 Vlad-Ioan Topan
+    Copyright (c) 2010-2011 Vlad-Ioan Topan
 
     author:           Vlad-Ioan Topan (vtopan / gmail.com)
-    file version:     0.2.4 (ALPHA)
+    file version:     0.2.5 (BETA)
     web:              http://code.google.com/p/mdmp/
 
     This file is part of MDmp.
